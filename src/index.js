@@ -63,9 +63,8 @@ class ScreenController {
     }
   }
 
-  async setBackground(location) {
-    console.log(location);
-    const url = await this.background.getBackgroundUrl(location);
+  async setBackground(query) {
+    const url = await this.background.getBackgroundUrl(query);
     if (url) {
       document.body.style.backgroundImage = `url(${url})`;
       document.body.style.backgroundSize = 'cover';
