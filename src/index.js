@@ -38,9 +38,7 @@ class ScreenController {
   }
 
   initializeHTML(data) {
-    this.locationHeader.textContent =
-      data.location.charAt(0).toUpperCase() +
-      data.location.slice(1).toLowerCase();
+    this.locationHeader.textContent = data.location;
     this.cardContainer.innerHTML = '';
 
     for (const dayData of data.days) {
@@ -50,9 +48,13 @@ class ScreenController {
   }
 
   constructCard(data) {
+    // temp, tempmin, tempmax, humidity, windspeed, conditions, datetime, icon
+
     const container = document.createElement('div');
+    container.classList.add('card');
+
     container.innerHTML = `
-    <p class="temperature">${data.temp}</p>
+    <p class="temperature">${data.temp}°C</p>
     `;
     return container;
   }
@@ -76,13 +78,14 @@ class WeatherAdapter {
     2. days: Array of at least 1 object
     Each object represents a day, ordered (index 0 - current, index 1 - next), and must have the following attributes:
 
+    Celsius
     temp: float, tempmin: float, tempmax: float, humidity: float, windspeed: float, conditions: string, datetime: string 'yyyy-dd-mm'
     icon: in set {'snow', 'rain', 'fog', 'wind', 'cloudy', 'partly-cloudy-day', 'partly-cloudy-night', 'clear-day', 'clear-night'}
     */
     data.days['0'].temp = data.currentConditions.temp;
 
     return {
-      location: data.address,
+      location: data.resolvedAddress,
       days: [
         data.days['0'],
         data.days['1'],
