@@ -64,14 +64,36 @@ class ScreenController {
   }
 
   async setBackground(query) {
-    const url = await this.background.getBackgroundUrl(query);
+    const url = await this.background.fetchBackgroundUrl(query);
     if (url) {
-      document.body.style.backgroundImage = `url(${url})`;
-      document.body.style.backgroundSize = 'cover';
-      document.body.style.backgroundPosition = 'center';
-      document.body.style.backgroundRepeat = 'no-repeat';
-      document.body.style.backdropFilter = 'blur(1px)';
+      this.#transitionBackground(url);
     }
+  }
+
+  #transitionBackground(url) {
+    const img = new Image();
+    img.src = url;
+
+    img.onload = () => {
+      const overlay = document.createElement('div');
+      overlay.className = 'background-overlay';
+      overlay.style.backgroundImage = `url(${img.src})`;
+
+      document.body.appendChild(overlay);
+
+      setTimeout(() => {
+        overlay.style.opacity = '1';
+      }, 10);
+
+      setTimeout(() => {
+        document.body.style.backgroundImage = `url(${img.src})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+
+        document.body.removeChild(overlay);
+      }, 1010);
+    };
   }
 
   initializeHTML(data) {
@@ -79,12 +101,12 @@ class ScreenController {
     this.cardContainer.innerHTML = '';
 
     for (const dayData of data.days) {
-      const card = this.constructCard(dayData);
+      const card = this.#constructCard(dayData);
       this.cardContainer.appendChild(card);
     }
   }
 
-  constructCard(data) {
+  #constructCard(data) {
     const parsedDate = parse(data.datetime, 'yyyy-MM-dd', new Date());
     const formattedDate = format(parsedDate, 'MMMM d, yyyy');
     const dayOfWeek = format(parsedDate, 'EEEE');
@@ -161,7 +183,7 @@ class backgroundAdapter {
     this.api = new pexelsAPI();
   }
 
-  async getBackgroundUrl(query) {
+  async fetchBackgroundUrl(query) {
     const data = await this.api.getBackground(query);
 
     if (data.photos && data.photos.length > 0) {
