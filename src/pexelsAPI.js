@@ -4,23 +4,23 @@ export default class pexelsAPI {
     this.key = 'nYRaYsLrdsA53YGX4S26JKzBrmZh53O6MviQt5uwxQvV4wBue3jrVdz1';
   }
 
-  async getBackground(query) {
-    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(
-      query
-    )}&per_page=1/`;
+  async fetchImages(query) {
+    const response = await fetch(
+      `https://api.pexels.com/v1/search?query=${query}&per_page=15&orientation=landscape`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: this.key,
+        },
+      }
+    );
 
-    const response = await fetch(url, {
-      mode: 'cors',
-      method: 'GET',
-      headers: {
-        Authorization: this.key,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.status !== 200) {
-      throw new Error('Failed to load background');
+    if (!response.ok) {
+      console.error(`HTTP error, status: ${response.status}`);
+      return [];
     }
-    return await response.json();
+
+    const data = await response.json();
+    return data.photos;
   }
 }

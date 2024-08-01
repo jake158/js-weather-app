@@ -72,8 +72,6 @@ class ScreenController {
 
   #transitionBackground(url) {
     const img = new Image();
-    img.src = url;
-
     img.onload = () => {
       const overlay = document.createElement('div');
       overlay.className = 'background-overlay';
@@ -94,14 +92,17 @@ class ScreenController {
         document.body.removeChild(overlay);
       }, 1010);
     };
+
+    img.src = url;
   }
 
   initializeHTML(data) {
     this.locationHeader.textContent = data.location;
     this.cardContainer.innerHTML = '';
 
-    for (const dayData of data.days) {
-      const card = this.#constructCard(dayData);
+    for (let i = 0; i < data.days.length; i++) {
+      const card = this.#constructCard(data.days[i]);
+      card.style.animationDelay = `${i * 0.1}s`;
       this.cardContainer.appendChild(card);
     }
   }
@@ -184,14 +185,13 @@ class backgroundAdapter {
   }
 
   async fetchBackgroundUrl(query) {
-    const data = await this.api.getBackground(query);
+    const data = await this.api.fetchImages(query);
 
-    if (data.photos && data.photos.length > 0) {
-      const imageUrl = data.photos[0].src.original;
-      return imageUrl;
-    } else {
-      console.error('No images found for the location.');
-      return null;
+    if (data.length > 0) {
+      return data[0].src.large2x;
     }
+
+    console.error('No images found with the required width.');
+    return null;
   }
 }
