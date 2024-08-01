@@ -7,14 +7,18 @@ document.addEventListener(
   () =>
     new ScreenController(
       document.querySelector('#search-location-form'),
-      document.querySelector('#search')
+      document.querySelector('#search'),
+      document.querySelector('.location-header'),
+      document.querySelector('.card-container')
     )
 );
 
 class ScreenController {
-  constructor(form, searchInput) {
+  constructor(form, searchInput, locationHeader, cardContainer) {
     this.form = form;
     this.input = searchInput;
+    this.locationHeader = locationHeader;
+    this.cardContainer = cardContainer;
     this.weather = new WeatherAdapter();
 
     this.form.addEventListener('submit', (event) => this.onUserSearch(event));
@@ -23,20 +27,38 @@ class ScreenController {
   async onUserSearch(event) {
     event.preventDefault();
     const location = this.input.value;
+    this.input.value = '';
+
     try {
       const data = await this.weather.getLocationData(location);
-      this.initializeCards(data);
+      this.initializeHTML(data);
     } catch (error) {
       this.showError(error.message);
     }
   }
 
-  initializeCards(data) {
-    console.log(data);
+  initializeHTML(data) {
+    this.locationHeader.textContent =
+      data.location.charAt(0).toUpperCase() +
+      data.location.slice(1).toLowerCase();
+    this.cardContainer.innerHTML = '';
+
+    for (const dayData of data.days) {
+      const card = this.constructCard(dayData);
+      this.cardContainer.appendChild(card);
+    }
+  }
+
+  constructCard(data) {
+    const container = document.createElement('div');
+    container.innerHTML = `
+    <p class="temperature">${data.temp}</p>
+    `;
+    return container;
   }
 
   showError(message) {
-    console.error(message);
+    alert(message);
   }
 }
 
@@ -49,18 +71,19 @@ class WeatherAdapter {
     /*
     Returns an object with the following attributes:
 
-    1. address: string
+    1. location: string
 
-    2. data: Array of 5 objects
+    2. days: Array of at least 1 object
     Each object represents a day, ordered (index 0 - current, index 1 - next), and must have the following attributes:
-    temp: float, tempmin: float, tempmax: float, humidity: float, windspeed: float, conditions: string
+
+    temp: float, tempmin: float, tempmax: float, humidity: float, windspeed: float, conditions: string, datetime: string 'yyyy-dd-mm'
     icon: in set {'snow', 'rain', 'fog', 'wind', 'cloudy', 'partly-cloudy-day', 'partly-cloudy-night', 'clear-day', 'clear-night'}
     */
     data.days['0'].temp = data.currentConditions.temp;
 
     return {
-      address: data.address,
-      data: [
+      location: data.address,
+      days: [
         data.days['0'],
         data.days['1'],
         data.days['2'],
