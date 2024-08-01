@@ -7,7 +7,6 @@ body {
 }
 
 .main-content {
-    background-color: gray;
     width: max(400px, 50vw);
     height: 500px;
     flex-shrink: 0;
@@ -17,12 +16,22 @@ body {
 }
 
 .header {
-    background-color: aqua;
     height: 100px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    width: 200px;
+    height: 35px;
+    font-size: 1.025rem;
+    border: 2px solid lightgray;
+    border-radius: 10px;
+    padding: 5px;
 }
 
 .card-container {
-    background-color: blue;
+    background-color: lightgray;
     flex: 1;
 }
