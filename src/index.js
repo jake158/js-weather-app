@@ -1,5 +1,6 @@
 import 'modern-normalize';
 import './style.css';
+import VcWeatherAPI from './visualCrossingAPI';
 
 document.addEventListener(
   'DOMContentLoaded',
@@ -19,18 +20,25 @@ class SearchController {
     this.form.addEventListener('submit', (event) => this.onUserSearch(event));
   }
 
-  onUserSearch(event) {
+  async onUserSearch(event) {
     event.preventDefault();
     const location = this.input.value;
-    const data = this.weather.getLocationData(location);
+    try {
+      const data = await this.weather.getLocationData(location);
+      console.log(data);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 }
 
 class WeatherAdapter {
-  constructor() {}
+  constructor() {
+    this.api = new VcWeatherAPI();
+  }
 
-  getLocationData(locationString) {
-    console.log(locationString);
-    return null;
+  async getLocationData(locationString) {
+    const data = await this.api.getLocationData(locationString);
+    return data;
   }
 }
