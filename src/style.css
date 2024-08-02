@@ -140,8 +140,9 @@ input:focus-visible {
 
 
 .weather-icon {
-    width: 40px;
-    height: auto;
+    height: 40px;
+    width: auto;
+    align-self: start;
 }
 
 .temperature {
